@@ -14,10 +14,7 @@ import {
   describeVoteSummary,
   enactPolicy,
   getEligibleChancellorIds,
-  getExecutivePowerForTrack,
   getInvestigationResult,
-  getNormalizedRegularNextPresident,
-  getPlayerCount,
   getPlayerOrThrow,
   getWinnerForHitlerElection,
   now,
@@ -387,6 +384,7 @@ export function applyCommand(
 
     case "reorder_seats": {
       assertPhase(state, "lobby");
+      assert(!state.seatLocked, "좌석이 잠겨 있어 순서를 바꿀 수 없습니다.");
       const currentIds = [...state.seatOrder].sort();
       const nextIds = [...command.seatOrder].sort();
       assert(
@@ -407,6 +405,7 @@ export function applyCommand(
 
     case "randomize_seats": {
       assertPhase(state, "lobby");
+      assert(!state.seatLocked, "좌석이 잠겨 있어 무작위 정렬을 할 수 없습니다.");
       return addLog(
         {
           ...state,
@@ -519,10 +518,24 @@ export function applyCommand(
           currentChancellorId: null
         };
 
-        nextState =
-          rejectedState.electionTracker >= 3
-            ? createChaosResolution(rejectedState, options)
-            : rejectedState;
+        if (rejectedState.electionTracker >= 3) {
+          const chaosState = createChaosResolution(rejectedState, options);
+          nextState = addLog(
+            addLog(
+              chaosState,
+              "chaos_policy_enacted",
+              "선거 추적기가 가득 차 정책이 자동 시행됩니다.",
+              options
+            ),
+            "policy_enacted",
+            chaosState.pendingPolicyResolution?.enactedPolicy === "liberal"
+              ? "자유 정책이 자동 시행되었습니다."
+              : "파시스트 정책이 자동 시행되었습니다.",
+            options
+          );
+        } else {
+          nextState = rejectedState;
+        }
       }
 
       nextState = addLog(
@@ -656,10 +669,18 @@ export function applyCommand(
       );
 
       if (nextState.electionTracker >= 3) {
+        const chaosState = createChaosResolution(nextState, options);
         nextState = addLog(
-          createChaosResolution(nextState, options),
-          "chaos_policy_enacted",
-          "선거 추적기가 가득 차 정책이 자동 시행됩니다.",
+          addLog(
+            chaosState,
+            "chaos_policy_enacted",
+            "선거 추적기가 가득 차 정책이 자동 시행됩니다.",
+            options
+          ),
+          "policy_enacted",
+          chaosState.pendingPolicyResolution?.enactedPolicy === "liberal"
+            ? "자유 정책이 자동 시행되었습니다."
+            : "파시스트 정책이 자동 시행되었습니다.",
           options
         );
         return {

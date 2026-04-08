@@ -1,0 +1,10 @@
+{
+  "name": "시크릿 히틀러 LAN",
+  "short_name": "시크릿 히틀러",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ece7df",
+  "theme_color": "#1f1b19",
+  "lang": "ko",
+  "description": "호스트 화면 1개와 플레이어 스마트폰으로 진행하는 LAN 전용 Secret Hitler PWA"
+}

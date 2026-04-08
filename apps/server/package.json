@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "tsx watch src/index.ts",
-    "build": "tsup src/index.ts --format esm --target node22 --dts false",
+    "build": "tsup",
     "typecheck": "tsc --noEmit",
     "start": "node dist/index.js"
   },
@@ -15,6 +15,7 @@
     "@secret/game-engine": "workspace:*",
     "@secret/shared": "workspace:*",
     "fastify": "^5.2.1",
-    "socket.io": "^4.8.1"
+    "socket.io": "^4.8.1",
+    "zod": "^3.24.3"
   }
 }

@@ -4,12 +4,17 @@
   "version": "0.1.0",
   "packageManager": "pnpm@10.0.0",
   "scripts": {
-    "dev": "concurrently -n server,web -c cyan,magenta \"pnpm --filter @secret/server dev\" \"pnpm --filter @secret/web dev\"",
-    "build": "pnpm -r build",
-    "typecheck": "pnpm -r typecheck",
+    "dev": "concurrently -n server,web -c cyan,magenta \"corepack pnpm --filter @secret/server dev\" \"corepack pnpm --filter @secret/web dev\"",
+    "build": "corepack pnpm -r build",
+    "typecheck": "corepack pnpm -r typecheck",
     "lint": "eslint .",
-    "test": "pnpm --filter @secret/game-engine test",
-    "test:e2e": "pnpm --filter @secret/web test:e2e"
+    "test": "corepack pnpm --filter @secret/game-engine test",
+    "test:e2e": "corepack pnpm --filter @secret/web test:e2e"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "esbuild"
+    ]
   },
   "devDependencies": {
     "@eslint/js": "^9.25.0",

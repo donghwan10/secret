@@ -17,6 +17,7 @@
     "lib": ["ES2022", "DOM", "DOM.Iterable"],
     "baseUrl": ".",
     "paths": {
+      "@/*": ["apps/web/src/*"],
       "@secret/shared": ["packages/shared/src/index.ts"],
       "@secret/shared/*": ["packages/shared/src/*"],
       "@secret/game-engine": ["packages/game-engine/src/index.ts"],

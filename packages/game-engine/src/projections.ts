@@ -65,6 +65,10 @@ type PlayerAction =
       waitingOnPresident: boolean;
     }
   | {
+      kind: "president_veto_response";
+      cards: [Policy, Policy];
+    }
+  | {
       kind: "investigate";
       eligibleTargetIds: string[];
       result: PartyMembership | null;
@@ -188,6 +192,7 @@ function getEligibleExecutiveTargets(
 }
 
 export function getHostView(state: RoomState): HostView {
+  const playerCount = state.seatOrder.length;
   const players = state.seatOrder.map((playerId, seatIndex) => ({
     id: playerId,
     nickname: state.players[playerId]?.nickname ?? playerId,
@@ -206,7 +211,10 @@ export function getHostView(state: RoomState): HostView {
     electionTracker: state.electionTracker,
     liberalPolicyCount: state.liberalPolicyCount,
     fascistPolicyCount: state.fascistPolicyCount,
-    fascistTrack: FASCIST_EXECUTIVE_TRACK[getPlayerCount(state)],
+    fascistTrack:
+      playerCount >= 5 && playerCount <= 10
+        ? FASCIST_EXECUTIVE_TRACK[getPlayerCount(state)]
+        : [],
     players,
     currentGovernment: {
       presidentId: state.currentPresidentId,
@@ -295,6 +303,18 @@ export function getPlayerView(state: RoomState, playerId: string): PlayerView {
         }
         break;
       case "chancellor_chooses_1_or_veto":
+        if (
+          state.currentPresidentId === playerId &&
+          state.pendingLegislativeSession?.cardsForChancellor &&
+          state.pendingLegislativeSession.vetoRequested
+        ) {
+          action = {
+            kind: "president_veto_response",
+            cards: state.pendingLegislativeSession.cardsForChancellor
+          };
+          break;
+        }
+
         if (
           state.currentChancellorId === playerId &&
           state.pendingLegislativeSession?.cardsForChancellor

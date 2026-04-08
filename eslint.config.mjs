@@ -7,12 +7,14 @@ import tseslint from "typescript-eslint";
 export default tseslint.config(
   {
     ignores: [
-      "dist/**",
+      "**/dist/**",
       "coverage/**",
       "playwright-report/**",
       "test-results/**",
       "docs/reference-pages/**",
-      "docs/reference-text/**"
+      "docs/reference-text/**",
+      "apps/web/public/**",
+      "scripts/**/*.cjs"
     ]
   },
   js.configs.recommended,

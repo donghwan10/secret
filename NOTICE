@@ -1,0 +1,17 @@
+This project is a non-commercial, share-alike, attribution-required derivative implementation based on Secret Hitler print-and-play and rulebook assets.
+
+Original game:
+- Secret Hitler
+- Designers: Mike Boxleiter, Tommy Maranges, Max Temkin, Mac Schubert
+- Official site: http://www.secrethitler.com
+- License: Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International (CC BY-NC-SA 4.0)
+
+Korean translation source used in this repository:
+- "시크릿 히틀러 - 게임 방법.pdf"
+- "시크릿 히틀러 - 프린트 플레이.pdf"
+- Translation credit shown in source PDFs: 백지훈 / gnsskd5009@naver.com
+
+Derivative-use notice:
+- This repository reuses and derives visual and textual assets from the referenced PDFs.
+- Redistribution and modification of this repository must preserve attribution and remain non-commercial under CC BY-NC-SA 4.0-compatible terms.
+- This project is intended for self-hosted LAN web use and is not designed for commercial distribution or native app-store distribution.

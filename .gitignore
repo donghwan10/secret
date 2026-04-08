@@ -1,0 +1,13 @@
+node_modules
+.pnpm-store
+dist
+coverage
+playwright-report
+test-results
+apps\web\dist
+apps\server\dist
+packages\shared\dist
+packages\game-engine\dist
+data
+*.log
+

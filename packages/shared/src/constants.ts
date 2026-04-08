@@ -52,6 +52,7 @@ export const PUBLIC_LOG_KINDS = [
   "nomination_made",
   "votes_revealed",
   "government_formed",
+  "hitler_chancellor_cleared",
   "government_rejected",
   "chaos_policy_enacted",
   "policy_enacted",

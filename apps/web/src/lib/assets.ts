@@ -7,7 +7,7 @@ import liberalRolePage from "../../../../docs/reference-pages/print-and-play/pag
 import rolePage from "../../../../docs/reference-pages/print-and-play/page-08.png";
 import membershipPage from "../../../../docs/reference-pages/print-and-play/page-09.png";
 import voteJaPage from "../../../../docs/reference-pages/print-and-play/page-04.png";
-import voteNeinPage from "../../../../docs/reference-pages/print-and-play/page-05.png";
+import voteNeinPage from "../../../../docs/reference-pages/print-and-play/page-06.png";
 import fascistPolicyPage from "../../../../docs/reference-pages/print-and-play/page-02.png";
 import liberalPolicyPage from "../../../../docs/reference-pages/print-and-play/page-04.png";
 

@@ -17,6 +17,7 @@ export function HostPage() {
   const [lanOrigin, setLanOrigin] = useState<string>("");
   const [qrCodeUrl, setQrCodeUrl] = useState<string>("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [publicLogPage, setPublicLogPage] = useState(1);
 
   useEffect(() => {
     if (!roomId || !hostToken) {
@@ -64,6 +65,7 @@ export function HostPage() {
       isMounted = false;
       socket.off("host:update", onHostUpdate);
       socket.off("server:error", onError);
+      socket.disconnect();
     };
   }, [hostToken, roomId]);
 
@@ -84,6 +86,26 @@ export function HostPage() {
       margin: 1
     }).then(setQrCodeUrl);
   }, [joinUrl]);
+
+  const totalLogPages = useMemo(() => {
+    if (!view) {
+      return 1;
+    }
+    return Math.max(1, Math.ceil(view.publicLog.length / 10));
+  }, [view]);
+
+  useEffect(() => {
+    setPublicLogPage((current) => Math.min(current, totalLogPages));
+  }, [totalLogPages]);
+
+  const pagedPublicLog = useMemo(() => {
+    if (!view) {
+      return [];
+    }
+    const newestFirst = [...view.publicLog].reverse();
+    const startIndex = (publicLogPage - 1) * 10;
+    return newestFirst.slice(startIndex, startIndex + 10);
+  }, [publicLogPage, view]);
 
   const submit = async (command: Parameters<typeof sendCommand>[1]) => {
     const socket = connectSocket();
@@ -130,7 +152,7 @@ export function HostPage() {
     <main className="host-page">
       <header className="host-topbar">
         <div>
-          <p className="eyebrow">HOST SCREEN</p>
+          <p className="eyebrow">공용 화면</p>
           <h1>방 코드 {view.roomCode}</h1>
           <p>{view.statusText}</p>
         </div>
@@ -251,15 +273,52 @@ export function HostPage() {
           </section>
 
           <section className="host-card">
-            <h2>공개 로그</h2>
+            <div className="host-card-header">
+              <h2>공개 로그</h2>
+              <span className="muted-text">
+                {publicLogPage}페이지 / {totalLogPages}페이지
+              </span>
+            </div>
             <ul className="public-log">
-              {[...view.publicLog].reverse().map((entry) => (
+              {pagedPublicLog.map((entry) => (
                 <li key={entry.id}>
                   <strong>{entry.message}</strong>
                   <span>{new Date(entry.createdAt).toLocaleTimeString()}</span>
                 </li>
               ))}
             </ul>
+            {totalLogPages > 1 ? (
+              <div className="pagination-controls">
+                <button
+                  disabled={publicLogPage === 1}
+                  onClick={() => setPublicLogPage((current) => Math.max(1, current - 1))}
+                  type="button"
+                >
+                  이전
+                </button>
+                <div className="pagination-pages">
+                  {Array.from({ length: totalLogPages }, (_, index) => index + 1).map((page) => (
+                    <button
+                      key={page}
+                      className={page === publicLogPage ? "active" : ""}
+                      onClick={() => setPublicLogPage(page)}
+                      type="button"
+                    >
+                      {page}
+                    </button>
+                  ))}
+                </div>
+                <button
+                  disabled={publicLogPage === totalLogPages}
+                  onClick={() =>
+                    setPublicLogPage((current) => Math.min(totalLogPages, current + 1))
+                  }
+                  type="button"
+                >
+                  다음
+                </button>
+              </div>
+            ) : null}
           </section>
         </aside>
       </section>

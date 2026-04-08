@@ -180,11 +180,16 @@ function advancePhase(state: RoomState, options?: EngineOptions): RoomState {
         return withWinner(state, winner, options);
       }
 
-      return {
-        ...startLegislativeSession(state, options),
-        phase: "president_draw_3",
-        updatedAt: now(options)
-      };
+      return addLog(
+        {
+          ...startLegislativeSession(state, options),
+          phase: "president_draw_3",
+          updatedAt: now(options)
+        },
+        "hitler_chancellor_cleared",
+        "새 수상은 히틀러가 아닙니다.",
+        options
+      );
     }
 
     case "enact_policy": {

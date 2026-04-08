@@ -13,7 +13,7 @@
 | 게임 방법 1페이지 | 랜딩 로고, 전체 색감과 포스터 분위기 | `apps/web/src/pages/HomePage.tsx`, `apps/web/src/styles.css`, `apps/web/src/lib/assets.ts` |
 | 프린트 플레이 2페이지 | 파시스트 정책 카드 crop | `apps/web/src/pages/PlayerPage.tsx`, `apps/web/src/lib/assets.ts` |
 | 프린트 플레이 4페이지 | Ja 투표 카드와 자유 정책 crop | `apps/web/src/pages/PlayerPage.tsx`, `apps/web/src/lib/assets.ts` |
-| 프린트 플레이 5페이지 | Nein 투표 카드 crop | `apps/web/src/pages/PlayerPage.tsx`, `apps/web/src/lib/assets.ts` |
+| 프린트 플레이 6페이지 | Nein 투표 카드 crop | `apps/web/src/pages/PlayerPage.tsx`, `apps/web/src/lib/assets.ts` |
 | 프린트 플레이 7페이지 | 자유당 역할 카드 | `apps/web/src/pages/PlayerPage.tsx`, `apps/web/src/lib/assets.ts` |
 | 프린트 플레이 8페이지 | 히틀러/파시스트 역할 카드 | `apps/web/src/pages/PlayerPage.tsx`, `apps/web/src/lib/assets.ts` |
 | 프린트 플레이 9페이지 | 자유당/파시스트 멤버십 카드 | `apps/web/src/pages/PlayerPage.tsx`, `apps/web/src/lib/assets.ts` |

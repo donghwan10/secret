@@ -16,7 +16,12 @@ interface StorePayload {
   rooms: PersistedRoomSnapshot[];
 }
 
-export class SnapshotStore {
+export interface SnapshotRepository {
+  load(): Promise<PersistedRoomSnapshot[]>;
+  save(rooms: PersistedRoomSnapshot[]): Promise<void>;
+}
+
+export class SnapshotStore implements SnapshotRepository {
   constructor(private readonly filePath: string) {}
 
   async load(): Promise<PersistedRoomSnapshot[]> {
@@ -41,7 +46,15 @@ export class SnapshotStore {
     };
     const tempPath = `${this.filePath}.tmp`;
     await fs.writeFile(tempPath, JSON.stringify(payload, null, 2), "utf8");
-    await fs.rm(this.filePath, { force: true });
-    await fs.rename(tempPath, this.filePath);
+    try {
+      await fs.rename(tempPath, this.filePath);
+    } catch (error) {
+      const nodeError = error as NodeJS.ErrnoException;
+      if (nodeError.code !== "EPERM") {
+        throw error;
+      }
+      await fs.rm(this.filePath, { force: true });
+      await fs.rename(tempPath, this.filePath);
+    }
   }
 }

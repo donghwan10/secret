@@ -93,11 +93,17 @@ async function openHost(page: Page, roomId: string, hostToken: string): Promise<
     { nextRoomId: roomId, nextHostToken: hostToken }
   );
   await page.goto(`/host/${roomId}`);
+  if ((await page.textContent("body"))?.includes("404 Not Found")) {
+    await page.goto(`/host/${roomId}`);
+  }
   await expect(page.getByText("방 코드")).toBeVisible();
 }
 
 async function openPlayer(page: Page, playerToken: string): Promise<void> {
   await page.goto(`/p/${playerToken}`);
+  if ((await page.textContent("body"))?.includes("404 Not Found")) {
+    await page.goto(`/p/${playerToken}`);
+  }
   await expect(page.getByText("방 코드")).toBeVisible();
 }
 

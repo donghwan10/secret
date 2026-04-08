@@ -183,6 +183,52 @@ describe("game engine", () => {
     });
   });
 
+  it("keeps votes hidden until all living players submit, then reveals every named vote at once", () => {
+    let state = toVotingOpen(buildRoom(5), "p1", "p2");
+
+    state = applyCommand(state, {
+      type: "cast_vote",
+      playerId: "p1",
+      vote: "ja"
+    });
+    state = applyCommand(state, {
+      type: "cast_vote",
+      playerId: "p2",
+      vote: "nein"
+    });
+
+    expect(state.phase).toBe("voting_open");
+    expect(getHostView(state).revealedVotes).toBeNull();
+
+    state = applyCommand(state, {
+      type: "cast_vote",
+      playerId: "p3",
+      vote: "ja"
+    });
+    state = applyCommand(state, {
+      type: "cast_vote",
+      playerId: "p4",
+      vote: "nein"
+    });
+    state = applyCommand(state, {
+      type: "cast_vote",
+      playerId: "p5",
+      vote: "ja"
+    });
+
+    expect(state.phase).toBe("voting_reveal");
+    expect(getHostView(state).revealedVotes).toEqual([
+      { playerId: "p1", nickname: "플레이어 1", vote: "ja" },
+      { playerId: "p2", nickname: "플레이어 2", vote: "nein" },
+      { playerId: "p3", nickname: "플레이어 3", vote: "ja" },
+      { playerId: "p4", nickname: "플레이어 4", vote: "nein" },
+      { playerId: "p5", nickname: "플레이어 5", vote: "ja" }
+    ]);
+    expect(state.publicLog.at(-1)?.message).toContain("플레이어 1 Ja");
+    expect(state.publicLog.at(-1)?.message).toContain("플레이어 2 Nein");
+    expect(state.publicLog.at(-1)?.message).toContain("Ja 3표, Nein 2표");
+  });
+
   it("awards fascist victory when hitler is elected chancellor after three fascist policies", () => {
     let state = withRoles(buildRoom(5), [
       "liberal",
@@ -206,6 +252,31 @@ describe("game engine", () => {
       winner: "fascists",
       reason: "hitler_elected_chancellor"
     });
+  });
+
+  it("publishes that a surviving chancellor is not hitler before legislation begins", () => {
+    let state = withRoles(buildRoom(5), [
+      "liberal",
+      "liberal",
+      "hitler",
+      "liberal",
+      "fascist"
+    ]);
+    state = setDeck(
+      {
+        ...toVotingOpen(state, "p1", "p2"),
+        fascistPolicyCount: 3
+      },
+      ["liberal", "fascist", "liberal", "fascist"]
+    );
+
+    state = voteAll(state, "ja");
+    state = applyCommand(state, { type: "advance_phase" });
+    state = applyCommand(state, { type: "advance_phase" });
+    state = applyCommand(state, { type: "advance_phase" });
+
+    expect(state.phase).toBe("president_draw_3");
+    expect(state.publicLog.at(-1)?.message).toBe("새 수상은 히틀러가 아닙니다.");
   });
 
   it("shows hitler as fascist when investigating party membership", () => {
@@ -573,5 +644,15 @@ describe("game engine", () => {
 
     expect(playerJson).toContain("hitler");
     expect(playerView.action.kind).toBe("president_discard");
+  });
+
+  it("shows the nominated chancellor in public state before the vote resolves", () => {
+    const state = {
+      ...toVotingOpen(buildRoom(5), "p1", "p4")
+    };
+
+    const hostView = getHostView(state);
+    expect(hostView.currentGovernment.presidentName).toBe("플레이어 1");
+    expect(hostView.currentGovernment.chancellorName).toBe("플레이어 4");
   });
 });

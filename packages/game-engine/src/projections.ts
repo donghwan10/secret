@@ -193,6 +193,7 @@ function getEligibleExecutiveTargets(
 
 export function getHostView(state: RoomState): HostView {
   const playerCount = state.seatOrder.length;
+  const publicChancellorId = state.currentChancellorId ?? state.nominatedChancellorId;
   const players = state.seatOrder.map((playerId, seatIndex) => ({
     id: playerId,
     nickname: state.players[playerId]?.nickname ?? playerId,
@@ -221,9 +222,9 @@ export function getHostView(state: RoomState): HostView {
       presidentName: state.currentPresidentId
         ? state.players[state.currentPresidentId]?.nickname ?? null
         : null,
-      chancellorId: state.currentChancellorId,
-      chancellorName: state.currentChancellorId
-        ? state.players[state.currentChancellorId]?.nickname ?? null
+      chancellorId: publicChancellorId,
+      chancellorName: publicChancellorId
+        ? state.players[publicChancellorId]?.nickname ?? null
         : null
     },
     revealedVotes: state.revealedVoteSummary?.revealedVotes ?? null,

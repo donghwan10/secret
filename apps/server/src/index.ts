@@ -124,9 +124,12 @@ async function main(): Promise<void> {
     socket.on("host:subscribe", (raw, callback) => {
       try {
         const payload = hostSubscribeSchema.parse(raw);
-        const view = roomService.subscribeHost(socket.id, payload.roomId, payload.hostToken);
-        socket.emit("host:update", view);
+        const result = roomService.subscribeHost(socket.id, payload.roomId, payload.hostToken);
+        socket.emit("host:update", result.view);
         callback?.({ ok: true });
+        for (const roomId of result.detachedRoomIds) {
+          pushRoom(roomId);
+        }
         pushRoom(payload.roomId);
       } catch (error) {
         const message = error instanceof Error ? error.message : "호스트 연결에 실패했습니다.";
@@ -138,10 +141,13 @@ async function main(): Promise<void> {
     socket.on("player:subscribe", (raw, callback) => {
       try {
         const payload = playerSubscribeSchema.parse(raw);
-        const view = roomService.subscribePlayer(socket.id, payload.playerToken);
-        socket.emit("player:update", view);
+        const result = roomService.subscribePlayer(socket.id, payload.playerToken);
+        socket.emit("player:update", result.view);
         callback?.({ ok: true });
-        pushRoom(view.roomId);
+        for (const roomId of result.detachedRoomIds) {
+          pushRoom(roomId);
+        }
+        pushRoom(result.view.roomId);
       } catch (error) {
         const message = error instanceof Error ? error.message : "플레이어 연결에 실패했습니다.";
         socket.emit("server:error", { message });
@@ -163,8 +169,7 @@ async function main(): Promise<void> {
     });
 
     socket.on("disconnect", () => {
-      const roomId = roomService.unsubscribe(socket.id);
-      if (roomId) {
+      for (const roomId of roomService.unsubscribe(socket.id)) {
         pushRoom(roomId);
       }
     });

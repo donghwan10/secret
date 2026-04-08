@@ -440,7 +440,10 @@ export function beginPresidency(state: RoomState, options?: EngineOptions): Room
 }
 
 export function describeVoteSummary(summary: RevealedVoteSummary): string {
-  return `Ja ${summary.jaCount}표, Nein ${summary.neinCount}표`;
+  const records = summary.revealedVotes
+    .map((record) => `${record.nickname} ${record.vote === "ja" ? "Ja" : "Nein"}`)
+    .join(", ");
+  return `투표 공개: ${records} (Ja ${summary.jaCount}표, Nein ${summary.neinCount}표)`;
 }
 
 export function validatePublicLogKind(kind: string): kind is PublicLogKind {

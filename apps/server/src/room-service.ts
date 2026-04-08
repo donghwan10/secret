@@ -9,7 +9,7 @@ import {
 import type { HostView, PlayerView, RoomState } from "@secret/game-engine";
 import type { Command } from "@secret/shared";
 
-import type { PersistedRoomSnapshot, SnapshotStore } from "./persistence.js";
+import type { PersistedRoomSnapshot, SnapshotRepository } from "./persistence.js";
 
 type SocketIdentity =
   | {
@@ -40,7 +40,7 @@ export class RoomService {
   private readonly socketIdentities = new Map<string, SocketIdentity>();
 
   constructor(
-    private readonly store: SnapshotStore,
+    private readonly store: SnapshotRepository,
     private readonly lanOrigin: string
   ) {}
 
@@ -171,25 +171,37 @@ export class RoomService {
     };
   }
 
-  subscribeHost(socketId: string, roomId: string, hostToken: string): HostView {
+  subscribeHost(
+    socketId: string,
+    roomId: string,
+    hostToken: string
+  ): { view: HostView; detachedRoomIds: string[] } {
     const room = this.getRoom(roomId);
     if (room.hostToken !== hostToken) {
       throw new Error("호스트 인증에 실패했습니다.");
     }
+    const detachedRoomIds = this.detachSocket(socketId).filter((id) => id !== roomId);
     room.hostSocketIds.add(socketId);
     this.socketIdentities.set(socketId, {
       kind: "host",
       roomId
     });
-    return this.getRoomHostView(room);
+    return {
+      view: this.getRoomHostView(room),
+      detachedRoomIds
+    };
   }
 
-  subscribePlayer(socketId: string, playerToken: string): PlayerView {
+  subscribePlayer(
+    socketId: string,
+    playerToken: string
+  ): { view: PlayerView; detachedRoomIds: string[] } {
     const entry = this.playerTokenIndex.get(playerToken);
     if (!entry) {
       throw new Error("플레이어 인증에 실패했습니다.");
     }
     const room = this.getRoom(entry.roomId);
+    const detachedRoomIds = this.detachSocket(socketId).filter((id) => id !== entry.roomId);
     const playerSockets = room.playerSocketIds.get(entry.playerId) ?? new Set<string>();
     playerSockets.add(socketId);
     room.playerSocketIds.set(entry.playerId, playerSockets);
@@ -199,27 +211,14 @@ export class RoomService {
       playerId: entry.playerId,
       playerToken
     });
-    return this.getRoomPlayerView(room, entry.playerId);
+    return {
+      view: this.getRoomPlayerView(room, entry.playerId),
+      detachedRoomIds
+    };
   }
 
-  unsubscribe(socketId: string): string | null {
-    const identity = this.socketIdentities.get(socketId);
-    if (!identity) {
-      return null;
-    }
-
-    const room = this.getRoom(identity.roomId);
-    if (identity.kind === "host") {
-      room.hostSocketIds.delete(socketId);
-    } else {
-      const sockets = room.playerSocketIds.get(identity.playerId);
-      sockets?.delete(socketId);
-      if (sockets && sockets.size === 0) {
-        room.playerSocketIds.delete(identity.playerId);
-      }
-    }
-    this.socketIdentities.delete(socketId);
-    return identity.roomId;
+  unsubscribe(socketId: string): string[] {
+    return this.detachSocket(socketId);
   }
 
   applySocketCommand(socketId: string, command: Command): string {
@@ -453,6 +452,28 @@ export class RoomService {
       state: room.state
     }));
     await this.store.save(snapshots);
+  }
+
+  private detachSocket(socketId: string): string[] {
+    const affectedRoomIds = new Set<string>();
+
+    for (const room of this.roomsById.values()) {
+      if (room.hostSocketIds.delete(socketId)) {
+        affectedRoomIds.add(room.roomId);
+      }
+
+      for (const [playerId, sockets] of room.playerSocketIds.entries()) {
+        if (sockets.delete(socketId)) {
+          affectedRoomIds.add(room.roomId);
+        }
+        if (sockets.size === 0) {
+          room.playerSocketIds.delete(playerId);
+        }
+      }
+    }
+
+    this.socketIdentities.delete(socketId);
+    return [...affectedRoomIds];
   }
 
   private createId(prefix: string): string {

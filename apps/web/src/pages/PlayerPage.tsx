@@ -79,6 +79,7 @@ export function PlayerPage() {
       isMounted = false;
       socket.off("player:update", onUpdate);
       socket.off("server:error", onError);
+      socket.disconnect();
     };
   }, [playerToken]);
 
@@ -162,7 +163,7 @@ export function PlayerPage() {
     <main className="player-page">
       <header className="player-header">
         <div>
-          <p className="eyebrow">PLAYER VIEW</p>
+          <p className="eyebrow">개인 화면</p>
           <h1>{view.nickname}</h1>
           <p>
             방 코드 {view.roomCode} / 라운드 {view.turn}
@@ -261,6 +262,7 @@ export function PlayerPage() {
               type="button"
             >
               <SpriteCrop alt="Ja 투표 카드" crop={crops.voteJa} source={assets.voteJa} />
+              <span className="vote-card-label">Ja</span>
             </button>
             <button
               className="vote-card-button"
@@ -269,6 +271,7 @@ export function PlayerPage() {
               type="button"
             >
               <SpriteCrop alt="Nein 투표 카드" crop={crops.voteNein} source={assets.voteNein} />
+              <span className="vote-card-label">Nein</span>
             </button>
           </div>
         ) : null}

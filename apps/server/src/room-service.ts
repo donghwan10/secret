@@ -38,6 +38,7 @@ export class RoomService {
   private readonly roomIdByCode = new Map<string, string>();
   private readonly playerTokenIndex = new Map<string, { roomId: string; playerId: string }>();
   private readonly socketIdentities = new Map<string, SocketIdentity>();
+  private persistQueue: Promise<void> = Promise.resolve();
 
   constructor(
     private readonly store: SnapshotRepository,
@@ -90,7 +91,7 @@ export class RoomService {
 
     this.roomsById.set(roomId, room);
     this.roomIdByCode.set(roomCode, roomId);
-    void this.persist();
+    this.enqueuePersist();
 
     return {
       roomId,
@@ -143,7 +144,7 @@ export class RoomService {
       roomId,
       playerId
     });
-    void this.persist();
+    this.enqueuePersist();
 
     return {
       roomId,
@@ -370,7 +371,7 @@ export class RoomService {
     }
 
     room.state = nextState;
-    void this.persist();
+    this.enqueuePersist();
     return room.roomId;
   }
 
@@ -411,7 +412,11 @@ export class RoomService {
       ...patch,
       players: nextPlayers
     };
-    void this.persist();
+    this.enqueuePersist();
+  }
+
+  async waitForPersistence(): Promise<void> {
+    await this.persistQueue;
   }
 
   private getRoom(roomId: string): RoomRecord {
@@ -443,15 +448,27 @@ export class RoomService {
     };
   }
 
-  private async persist(): Promise<void> {
-    const snapshots: PersistedRoomSnapshot[] = [...this.roomsById.values()].map((room) => ({
+  private buildPersistedSnapshots(): PersistedRoomSnapshot[] {
+    return [...this.roomsById.values()].map((room) => ({
       roomId: room.roomId,
       roomCode: room.roomCode,
       hostToken: room.hostToken,
-      playerTokens: room.playerTokens,
+      playerTokens: { ...room.playerTokens },
       state: room.state
     }));
-    await this.store.save(snapshots);
+  }
+
+  private enqueuePersist(): void {
+    const snapshots = this.buildPersistedSnapshots();
+    const save = async (): Promise<void> => {
+      try {
+        await this.store.save(snapshots);
+      } catch (error) {
+        console.error("Failed to persist room snapshots.", error);
+      }
+    };
+
+    this.persistQueue = this.persistQueue.then(save, save);
   }
 
   private detachSocket(socketId: string): string[] {

@@ -191,70 +191,137 @@ button.accent {
 
 .host-board {
   display: grid;
-  grid-template-columns: 1fr auto 1fr;
-  gap: 14px;
-  align-items: stretch;
+  gap: 18px;
 }
 
-.board-track {
+.print-board-sheet {
   position: relative;
-  min-height: 320px;
-  padding: 18px;
-  border: 1px solid rgba(31, 27, 25, 0.12);
+  display: grid;
+  gap: 10px;
+  padding: 12px;
+  border: 1px solid rgba(31, 27, 25, 0.2);
+  background: #fffdfa;
   overflow: hidden;
+  box-shadow: 0 14px 34px rgba(31, 27, 25, 0.12);
+}
+
+.print-board-header {
   display: flex;
-  flex-direction: column;
-  justify-content: flex-end;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 0 2px;
 }
 
-.board-art {
-  position: absolute;
-  inset: 8px;
-  opacity: 0.42;
-  pointer-events: none;
-  filter: grayscale(100%) contrast(1.05);
-  mix-blend-mode: multiply;
+.print-board-header h2 {
+  margin: 0;
+  font-size: 1.15rem;
 }
 
-.track-cells,
-.tracker-panel {
-  position: relative;
-  z-index: 1;
+.print-board-header strong {
+  display: inline-grid;
+  min-width: 58px;
+  min-height: 34px;
+  place-items: center;
+  border: 1px solid rgba(31, 27, 25, 0.22);
+  background: #2d2723;
+  color: #f7f1ea;
+  font-weight: 800;
 }
 
-.track-label,
+.print-board-image {
+  display: block;
+  width: 100%;
+  height: auto;
+  border: 1px solid rgba(31, 27, 25, 0.16);
+  background: #fff;
+  filter: contrast(1.18) brightness(0.96);
+}
+
+.board-policy-strip {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  align-items: center;
+  justify-items: center;
+  gap: 10px;
+  min-height: 118px;
+  padding: 10px;
+  border: 1px solid rgba(31, 27, 25, 0.16);
+  background: #f7f3eb;
+}
+
+.print-board-sheet.liberal .board-policy-strip {
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+}
+
+.board-policy-marker {
+  box-sizing: border-box;
+  width: 72px;
+  max-width: 100%;
+  border: 1px solid rgba(31, 27, 25, 0.18);
+  background: #f9f6ef;
+  box-shadow: 0 8px 16px rgba(31, 27, 25, 0.08);
+}
+
+.board-policy-marker.empty {
+  height: 104px;
+  min-height: 0;
+  border-style: dashed;
+  background:
+    repeating-linear-gradient(
+      45deg,
+      rgba(31, 27, 25, 0.06) 0,
+      rgba(31, 27, 25, 0.06) 6px,
+      transparent 6px,
+      transparent 12px
+    ),
+    rgba(247, 242, 234, 0.64);
+}
+
+.print-board-sheet.fascist .board-policy-marker {
+  width: 110px;
+}
+
+.print-board-sheet.fascist .board-policy-marker.empty {
+  height: 72px;
+}
+
+.board-power-strip {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 8px;
+  padding: 0;
+  margin: 0;
+  list-style: none;
+}
+
+.board-power-strip li {
+  display: grid;
+  gap: 4px;
+  align-content: center;
+  min-height: 54px;
+  padding: 8px;
+  border: 1px solid rgba(31, 27, 25, 0.16);
+  background: rgba(247, 242, 234, 0.72);
+}
+
+.board-power-strip li.active {
+  background: #2d2723;
+  color: #f7f1ea;
+}
+
+.board-power-strip span,
+.board-power-strip strong {
+  display: block;
+  font-size: 0.78rem;
+  line-height: 1.2;
+}
+
 .tracker-title,
 .eyebrow {
   text-transform: uppercase;
-  letter-spacing: 0.16em;
+  letter-spacing: 0;
   font-size: 0.74rem;
-}
-
-.track-grid {
-  display: grid;
-  gap: 8px;
-  margin-top: 10px;
-}
-
-.track-cell {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 16px;
-  padding: 10px 12px;
-  border: 1px solid rgba(31, 27, 25, 0.14);
-  background: rgba(248, 242, 233, 0.86);
-}
-
-.track-cell.filled {
-  background: rgba(66, 58, 51, 0.92);
-  color: #f5efe9;
-}
-
-.track-cell small {
-  display: block;
-  max-width: 120px;
-  text-align: right;
 }
 
 .tracker-panel {
@@ -264,6 +331,7 @@ button.accent {
   gap: 12px;
   padding: 20px;
   border: 1px solid rgba(31, 27, 25, 0.14);
+  background: rgba(247, 242, 234, 0.78);
 }
 
 .tracker-dots {
@@ -438,7 +506,6 @@ button.accent {
   width: 100%;
   border: 1px solid rgba(31, 27, 25, 0.16);
   background: rgba(247, 242, 234, 0.9);
-  filter: grayscale(100%) contrast(1.04);
 }
 
 .policy-choice-button,

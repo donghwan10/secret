@@ -1,8 +1,8 @@
 import coverPage from "../../../../docs/reference-pages/game-guide/page-01.png";
-import liberalBoardPage from "../../../../docs/reference-pages/print-and-play/page-10.png";
-import fascistBoard56Page from "../../../../docs/reference-pages/print-and-play/page-11.png";
-import fascistBoard78Page from "../../../../docs/reference-pages/print-and-play/page-12.png";
-import fascistBoard910Page from "../../../../docs/reference-pages/print-and-play/page-13.png";
+import liberalBoardImage from "../assets/print-and-play/boards/liberal-board.png";
+import fascistBoard56Image from "../assets/print-and-play/boards/fascist-board-56.png";
+import fascistBoard78Image from "../assets/print-and-play/boards/fascist-board-78.png";
+import fascistBoard910Image from "../assets/print-and-play/boards/fascist-board-910.png";
 import liberalRolePage from "../../../../docs/reference-pages/print-and-play/page-07.png";
 import rolePage from "../../../../docs/reference-pages/print-and-play/page-08.png";
 import membershipPage from "../../../../docs/reference-pages/print-and-play/page-09.png";
@@ -37,6 +37,12 @@ const portrait = (src: string): SpriteSource => ({
   height: 1760
 });
 
+const stitchedBoard = (src: string, width = 2114): SpriteSource => ({
+  src,
+  width,
+  height: 670
+});
+
 export const assets = {
   cover: portrait(coverPage),
   roleLiberal: landscape(liberalRolePage),
@@ -46,10 +52,10 @@ export const assets = {
   voteNein: landscape(voteNeinPage),
   fascistPolicy: landscape(fascistPolicyPage),
   liberalPolicy: landscape(liberalPolicyPage),
-  liberalBoard: landscape(liberalBoardPage),
-  fascistBoard56: landscape(fascistBoard56Page),
-  fascistBoard78: landscape(fascistBoard78Page),
-  fascistBoard910: landscape(fascistBoard910Page)
+  liberalBoard: stitchedBoard(liberalBoardImage),
+  fascistBoard56: stitchedBoard(fascistBoard56Image, 2126),
+  fascistBoard78: stitchedBoard(fascistBoard78Image, 2126),
+  fascistBoard910: stitchedBoard(fascistBoard910Image, 2126)
 };
 
 export const crops = {
@@ -61,10 +67,6 @@ export const crops = {
   membershipFascist: { x: 60, y: 35, width: 350, height: 585 } satisfies CropRect,
   voteJa: { x: 55, y: 35, width: 340, height: 610 } satisfies CropRect,
   voteNein: { x: 55, y: 35, width: 340, height: 610 } satisfies CropRect,
-  fascistPolicy: { x: 235, y: 90, width: 355, height: 500 } satisfies CropRect,
-  liberalPolicy: { x: 700, y: 265, width: 235, height: 350 } satisfies CropRect,
-  liberalBoard: { x: 40, y: 80, width: 800, height: 1200, rotate: 90 } satisfies CropRect,
-  fascistBoard56: { x: 40, y: 80, width: 800, height: 1200, rotate: 90 } satisfies CropRect,
-  fascistBoard78: { x: 40, y: 80, width: 800, height: 1200, rotate: 90 } satisfies CropRect,
-  fascistBoard910: { x: 40, y: 80, width: 800, height: 1200, rotate: 90 } satisfies CropRect
+  fascistPolicy: { x: 240, y: 145, width: 360, height: 240 } satisfies CropRect,
+  liberalPolicy: { x: 690, y: 330, width: 235, height: 360 } satisfies CropRect
 };

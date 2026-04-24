@@ -163,8 +163,8 @@ export function getEligibleChancellorIds(state: RoomState): string[] {
   const presidentId = state.currentPresidentId;
   assert(presidentId, "대통령 후보가 없습니다.");
 
-  const playerCount = getPlayerCount(state);
   const alive = aliveSeatOrder(state);
+  const alivePlayerCount = alive.length;
 
   return alive.filter((candidateId) => {
     if (candidateId === presidentId) {
@@ -176,7 +176,7 @@ export function getEligibleChancellorIds(state: RoomState): string[] {
       return false;
     }
 
-    if (playerCount !== 5 && candidateId === lastGovernment.presidentId) {
+    if (alivePlayerCount !== 5 && candidateId === lastGovernment.presidentId) {
       return false;
     }
 

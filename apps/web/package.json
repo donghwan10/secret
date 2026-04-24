@@ -7,8 +7,9 @@
     "dev": "vite --host",
     "build": "vite build",
     "typecheck": "tsc --noEmit",
+    "test": "node ../../node_modules/vitest/vitest.mjs run src/lib/socket.test.ts",
     "preview": "vite preview --host",
-    "test:e2e": "playwright test"
+    "test:e2e": "corepack pnpm --filter @secret/server build && corepack pnpm --filter @secret/web build && playwright test"
   },
   "dependencies": {
     "@secret/game-engine": "workspace:*",

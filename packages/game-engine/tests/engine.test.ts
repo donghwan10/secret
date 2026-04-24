@@ -44,6 +44,25 @@ function withRoles(state: RoomState, roles: Role[]): RoomState {
   };
 }
 
+function withDeadPlayers(state: RoomState, playerIds: string[]): RoomState {
+  const players = { ...state.players };
+  for (const playerId of playerIds) {
+    const existing = players[playerId];
+    if (!existing) {
+      throw new Error(`missing player ${playerId}`);
+    }
+    players[playerId] = {
+      ...existing,
+      isAlive: false
+    };
+  }
+
+  return {
+    ...state,
+    players
+  };
+}
+
 function setDeck(state: RoomState, drawPile: Policy[], discardPile: Policy[] = []): RoomState {
   return {
     ...state,
@@ -152,6 +171,34 @@ describe("game engine", () => {
 
     const eligible = getEligibleChancellorIds(state);
     expect(eligible).toContain("p1");
+    expect(eligible).not.toContain("p2");
+  });
+
+  it("applies the five-player chancellor eligibility exception to living players", () => {
+    const state = {
+      ...withDeadPlayers(toNomination(buildRoom(7), "p3"), ["p6", "p7"]),
+      lastElectedGovernment: {
+        presidentId: "p1",
+        chancellorId: "p2"
+      }
+    };
+
+    const eligible = getEligibleChancellorIds(state);
+    expect(eligible).toContain("p1");
+    expect(eligible).not.toContain("p2");
+  });
+
+  it("keeps the previous president ineligible while more than five players are alive", () => {
+    const state = {
+      ...withDeadPlayers(toNomination(buildRoom(7), "p3"), ["p7"]),
+      lastElectedGovernment: {
+        presidentId: "p1",
+        chancellorId: "p2"
+      }
+    };
+
+    const eligible = getEligibleChancellorIds(state);
+    expect(eligible).not.toContain("p1");
     expect(eligible).not.toContain("p2");
   });
 
